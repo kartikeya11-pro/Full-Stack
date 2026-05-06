@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vel Tech | Student Experience Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --vt-blue: #003366;
+            --vt-orange: #f37021;
+            --bg: #f8fafc;
+            --sidebar-w: 260px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: var(--bg); display: flex; min-height: 100vh; color: #1e293b; }
+
+        /* --- Auth Overlay --- */
+        #auth-overlay {
+            position: fixed; inset: 0; background: var(--vt-blue); z-index: 2000;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .auth-card { background: white; padding: 40px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; }
+
+        /* --- Sidebar --- */
+        .sidebar { width: var(--sidebar-w); background: var(--vt-blue); color: white; padding: 30px 15px; position: fixed; height: 100vh; z-index: 100; }
+        .logo { font-size: 22px; font-weight: 800; margin-bottom: 40px; text-align: center; color: var(--vt-orange); }
+        .nav-link { padding: 12px 20px; margin: 8px 0; border-radius: 12px; cursor: pointer; transition: 0.3s; color: rgba(255,255,255,0.7); display: flex; align-items: center; gap: 12px; }
+        .nav-link:hover, .nav-link.active { background: rgba(255,255,255,0.1); color: white; border-left: 4px solid var(--vt-orange); }
+
+        /* --- Content Layout --- */
+        .content { margin-left: var(--sidebar-w); flex-grow: 1; padding: 40px; width: calc(100% - var(--sidebar-w)); }
+        .view { display: none; animation: fadeIn 0.4s ease-in-out; }
+        .view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- Event Grid --- */
+        .section-title { margin: 30px 0 15px; font-size: 20px; color: var(--vt-blue); border-left: 4px solid var(--vt-orange); padding-left: 10px; }
+        .event-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .event-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.05); transition: 0.4s; cursor: pointer; border: 1px solid #edf2f7; }
+        .event-card:hover { transform: translateY(-8px); }
+        .event-img { height: 150px; background-size: cover; background-position: center; position: relative; }
+        .countdown-badge { position: absolute; top: 15px; right: 15px; background: var(--vt-orange); color: white; padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .event-info { padding: 20px; }
+        .event-info h4 { font-size: 17px; margin-bottom: 5px; color: var(--vt-blue); }
+
+        /* --- Forms & Buttons --- */
+        .form-card { background: white; padding: 40px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); max-width: 600px; margin: 0 auto; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; }
+        input, select { width: 100%; padding: 14px; border: 2px solid #f1f5f9; border-radius: 12px; font-size: 15px; }
+        .btn-prime { background: var(--vt-blue); color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer; transition: 0.3s; }
+        .btn-prime:hover { background: var(--vt-orange); }
+
+        /* --- Vault Items --- */
+        .vault-item { background: white; padding: 20px; border-radius: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <h2 style="color: var(--vt-blue)">Vel Tech Portal</h2>
+            <p style="margin-bottom: 20px; font-size: 14px; color: #64748b;">Login to access registrations</p>
+            <form id="login-form">
+                <input type="email" id="login-email" placeholder="Email" required style="margin-bottom: 10px;">
+                <input type="password" id="login-pass" placeholder="Password" required style="margin-bottom: 20px;">
+                <button type="submit" class="btn-prime">Sign In</button>
+            </form>
+        </div>
+    </div>
+
+    <nav class="sidebar">
+        <div class="logo">VEL TECH</div>
+        <div id="nav-events-view" class="nav-link active" onclick="showView('events-view')">🎭 Explore Events</div>
+        <div id="nav-reg-view" class="nav-link" onclick="showView('reg-view')">📝 Registration</div>
+        <div id="nav-vault-view" class="nav-link" onclick="showView('vault-view')">📜 My Vault</div>
+        <div class="nav-link" onclick="handleLogout()" style="margin-top: auto; color: #ff4d4d;">🚪 Logout</div>
+    </nav>
+
+    <main class="content">
+        <section id="events-view" class="view active">
+            <h1 style="font-size: 32px; color: var(--vt-blue);">Campus Happenings</h1>
+            <p style="color: #64748b; margin-bottom: 30px;">Live updates on workshops and festivals.</p>
+
+            <div class="section-title">🏆 University Flagships</div>
+            <div id="major-grid" class="event-grid"></div>
+
+            <div class="section-title">💻 Technical Workshops</div>
+            <div id="workshop-grid" class="event-grid"></div>
+
+            <div class="section-title">✨ Festival Celebrations</div>
+            <div id="festival-grid" class="event-grid"></div>
+        </section>
+
+        <section id="reg-view" class="view">
+            <div class="form-card">
+                <h2>Event Registration</h2>
+                <form id="main-reg-form">
+                    <div class="form-group"><label>Full Name</label><input type="text" id="stu-name" required></div>
+                    <div class="form-group"><label>Student ID</label><input type="text" id="stu-id" required></div>
+                    <div class="form-group">
+                        <label>Select Event</label>
+                        <select id="event-select" required></select>
+                    </div>
+                    <button type="submit" id="reg-submit-btn" class="btn-prime">Complete Registration</button>
+                </form>
+            </div>
+        </section>
+
+        <section id="vault-view" class="view">
+            <h2>Digital Vault</h2>
+            <p style="color: #64748b; margin-bottom: 20px;">Your registered events and certificates.</p>
+            <div id="vault-list"></div>
+        </section>
+    </main>
+
+    <script type="module">
+        // --- 1. Firebase Initialization ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, where, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD4THZXfu8QArVtlraS1SD3Dj2yjiSNp9U",
+            authDomain: "studenteventportal-d195f.firebaseapp.com",
+            projectId: "studenteventportal-d195f",
+            storageBucket: "studenteventportal-d195f.firebasestorage.app",
+            messagingSenderId: "691734379426",
+            appId: "1:691734379426:web:d0b54187f01b2b323890fb"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        let currentUserEmail = "";
+
+        // --- 2. Event Data ---
+        const eventData = {
+            major: [
+                { name: "Tantraz 2026", date: "2026-04-15", img: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=500" },
+                { name: "Vel Tech Hackathon", date: "2026-05-10", img: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=500" },
+                { name: "Annual Sports Meet", date: "2026-06-20", img: "https://images.unsplash.com/photo-1526676037777-05a232554f77?w=500" },
+                { name: "Cultural Activities", date: "2026-07-05", img: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=500" }
+            ],
+            workshops: [
+                { name: "Full Stack Web Dev", date: "2026-04-20", img: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=500" },
+                { name: "Applied Programming", date: "2026-04-25", img: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=500" },
+                { name: "Java Problem Solving", date: "2026-05-01", img: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=500" },
+                { name: "Aptitude Skills", date: "2026-05-05", img: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=500" },
+                { name: "Communication Mastery", date: "2026-05-12", img: "https://images.unsplash.com/photo-1521791136064-7986c29535a7?w=500" }
+            ],
+            festivals: [
+                { name: "Pongal Feast", date: "2027-01-14", img: "https://images.unsplash.com/photo-1582298538104-fe2e74c27f59?w=500" },
+                { name: "Diwali Night", date: "2026-11-08", img: "https://images.unsplash.com/photo-1573456170607-b38440735397?w=500" },
+                { name: "Holi Color Bash", date: "2027-03-03", img: "https://images.unsplash.com/photo-1544414170-43890352220d?w=500" },
+                { name: "Onam Celebration", date: "2026-08-27", img: "https://images.unsplash.com/photo-1605370621430-802c67676747?w=500" },
+                { name: "Christmas Eve", date: "2026-12-24", img: "https://images.unsplash.com/photo-1544273677-241515275507?w=500" },
+                { name: "Eid Milan", date: "2026-03-31", img: "https://images.unsplash.com/photo-1563811771046-ba984ff30900?w=500" },
+                { name: "Navratri Dandiya", date: "2026-10-12", img: "https://images.unsplash.com/photo-1601050638914-72436d47400d?w=500" },
+                { name: "Ganesh Utsav", date: "2026-09-15", img: "https://images.unsplash.com/photo-1567591974574-e852637b18df?w=500" }
+            ]
+        };
+
+        // --- 3. UI Helper Logic ---
+        window.getDaysRemaining = (targetDate) => {
+            const diff = new Date(targetDate) - new Date();
+            const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+            return days > 0 ? `${days} Days Left` : "Live Now";
+        };
+
+        window.showView = (id) => {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.getElementById('nav-' + id).classList.add('active');
+        };
+
+        window.quickRegister = (name) => {
+            document.getElementById('event-select').value = name;
+            showView('reg-view');
+        };
+
+        // --- 4. Auth Logic ---
+        document.getElementById('login-form').onsubmit = async (e) => {
+            e.preventDefault();
+            try {
+                await signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-pass').value);
+            } catch (err) { alert("Login Failed: " + err.message); }
+        };
+
+        window.handleLogout = () => signOut(auth);
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUserEmail = user.email;
+                document.getElementById('auth-overlay').classList.add('hidden');
+                syncVault();
+            } else {
+                document.getElementById('auth-overlay').classList.remove('hidden');
+            }
+        });
+
+        // --- 5. Data Handling ---
+        function initApp() {
+            const selectEl = document.getElementById('event-select');
+            const render = (cat, gridId) => {
+                const grid = document.getElementById(gridId);
+                eventData[cat].forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item.name; opt.textContent = item.name;
+                    selectEl.appendChild(opt);
+
+                    grid.innerHTML += `
+                        <div class="event-card" onclick="quickRegister('${item.name}')">
+                            <div class="event-img" style="background-image: url('${item.img}')">
+                                <div class="countdown-badge">${getDaysRemaining(item.date)}</div>
+                            </div>
+                            <div class="event-info">
+                                <h4>${item.name}</h4>
+                                <p style="font-size:12px;">Happening: ${item.date}</p>
+                            </div>
+                        </div>`;
+                });
+            };
+            render('major', 'major-grid');
+            render('workshops', 'workshop-grid');
+            render('festivals', 'festival-grid');
+        }
+
+        document.getElementById('main-reg-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('reg-submit-btn');
+            btn.disabled = true; btn.innerText = "Processing...";
+            
+            try {
+                await addDoc(collection(db, "registrations"), {
+                    studentName: document.getElementById('stu-name').value,
+                    studentId: document.getElementById('stu-id').value,
+                    eventName: document.getElementById('event-select').value,
+                    email: currentUserEmail,
+                    timestamp: serverTimestamp()
+                });
+                alert("Registration Successful!");
+                showView('vault-view');
+            } catch (err) { alert(err.message); }
+            finally { btn.disabled = false; btn.innerText = "Complete Registration"; }
+        };
+
+        function syncVault() {
+            const q = query(collection(db, "registrations"), where("email", "==", currentUserEmail));
+            onSnapshot(q, (snap) => {
+                const list = document.getElementById('vault-list');
+                list.innerHTML = "";
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    list.innerHTML += `
+                        <div class="vault-item">
+                            <div>
+                                <strong>${data.eventName}</strong><br>
+                                <span style="font-size:12px; color:#64748b;">ID: ${data.studentId}</span>
+                            </div>
+                            <button class="btn-prime" style="width:auto; padding:8px 15px;" 
+                                onclick="generatePDF('${data.studentName}', '${data.eventName}')">PDF</button>
+                        </div>`;
+                });
+            });
+        }
+
+        // --- 6. PDF Generation ---
+        window.generatePDF = (name, event) => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(22);
+            doc.text("VEL TECH UNIVERSITY", 105, 30, { align: "center" });
+            doc.setFontSize(16);
+            doc.text("Official Registration Certificate", 105, 50, { align: "center" });
+            doc.setFontSize(12);
+            doc.text(`Student Name: ${name}`, 20, 80);
+            doc.text(`Registered Event: ${event}`, 20, 90);
+            doc.text(`Status: Verified in Database`, 20, 100);
+            doc.save(`${event}_Receipt.pdf`);
+        };
+
+        initApp();
+    </script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+:root {
+    --veltech-blue: #003366;
+    --veltech-blue-dark: #001a33;
+    --veltech-orange: #f37021;
+    --glass-white: rgba(255, 255, 255, 0.94);
+    --input-bg: #f8fafc;
+    --text-main: #2d3748;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    /* Modern Mesh Gradient Background */
+    background-color: #003366;
+    background-image: 
+        radial-gradient(at 0% 0%, hsla(210,100%,20%,1) 0, transparent 50%), 
+        radial-gradient(at 100% 0%, hsla(22,90%,54%,1) 0, transparent 50%), 
+        radial-gradient(at 100% 100%, hsla(210,100%,30%,1) 0, transparent 50%), 
+        radial-gradient(at 0% 100%, hsla(210,100%,15%,1) 0, transparent 50%);
+    background-attachment: fixed;
+}
+
+.main-card {
+    background: var(--glass-white);
+    backdrop-filter: blur(12px); /* Glassmorphism */
+    -webkit-backdrop-filter: blur(12px);
+    width: 100%;
+    max-width: 480px;
+    padding: 50px 40px;
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+    animation: cardAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes cardAppear {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Orange accent line at the top */
+.main-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--veltech-blue), var(--veltech-orange));
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.logo-circle {
+    width: 60px;
+    height: 60px;
+    background: var(--veltech-blue);
+    color: white;
+    font-weight: 700;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    box-shadow: 0 10px 15px rgba(0, 51, 102, 0.2);
+}
+
+.header h1 {
+    color: var(--veltech-blue);
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: -1px;
+}
+
+.header p {
+    color: #64748b;
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 22px;
+}
+
+label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--veltech-blue);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+input, select {
+    width: 100%;
+    padding: 15px 18px;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    background: var(--input-bg);
+    color: var(--text-main);
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--veltech-orange);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(243, 112, 33, 0.1);
+}
+
+/* Custom Select Arrow */
+.select-wrapper {
+    position: relative;
+}
+
+.select-wrapper::after {
+    content: "▼";
+    font-size: 10px;
+    color: var(--veltech-blue);
+    position: absolute;
+    right: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+select {
+    appearance: none;
+}
+
+/* Primary Button */
+button {
+    width: 100%;
+    background: linear-gradient(135deg, var(--veltech-blue) 0%, var(--veltech-blue-dark) 100%);
+    color: white;
+    padding: 18px;
+    border: none;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    margin-top: 15px;
+    box-shadow: 0 10px 20px rgba(0, 51, 102, 0.2);
+}
+
+button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 25px rgba(0, 51, 102, 0.3);
+    filter: brightness(1.1);
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+.footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 11px;
+    color: #94a3b8;
+    line-height: 1.6;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 20px;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .main-card {
+        padding: 40px 25px;
+    }
+    .header h1 {
+        font-size: 26px;
+    }
+}
